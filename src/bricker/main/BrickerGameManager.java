@@ -200,6 +200,11 @@ public class BrickerGameManager extends GameManager {
         Renderable ballImage = imageReader.readImage(BALL_IMAGE_PATH, true);
         Sound collisionSound = soundReader.readSound(BALL_SOUND_PATH);
         ball = new Ball(Vector2.ZERO, BALL_SIZE, ballImage, collisionSound);
+        setRandomBallSpeed(ball);
+        gameObjects().addGameObject(ball);
+    }
+
+    private void setRandomBallSpeed(Ball ball) {
         float ballVelX = BALL_SPEED;
         float ballVelY = BALL_SPEED;
         Random rand = new Random();
@@ -207,18 +212,30 @@ public class BrickerGameManager extends GameManager {
         if (rand.nextBoolean()) ballVelY *= -1;
         ball.setVelocity(new Vector2(ballVelX, ballVelY));
         ball.setCenter(windowDimensions.mult(0.5f));
-        gameObjects().addGameObject(ball);
     }
 
     private void createWalls() {
-        GameObject leftWall = new GameObject(Vector2.ZERO, new Vector2(WALL_WIDTH, windowDimensions.y()), null);
-        GameObject rightWall = new GameObject(
-                new Vector2(windowDimensions.x() - WALL_WIDTH, 0),
-                new Vector2(WALL_WIDTH, windowDimensions.y()), null);
-        GameObject topWall = new GameObject(Vector2.ZERO, new Vector2(windowDimensions.x(), WALL_HEIGHT), null);
-        gameObjects().addGameObject(leftWall, Layer.STATIC_OBJECTS);
-        gameObjects().addGameObject(rightWall, Layer.STATIC_OBJECTS);
-        gameObjects().addGameObject(topWall, Layer.STATIC_OBJECTS);
+        Vector2[][] wallLocations = new Vector2[3][2];
+
+        Vector2 yVec = new Vector2(WALL_WIDTH, windowDimensions.y());
+
+        // left
+        wallLocations[0][0] = Vector2.ZERO;
+        wallLocations[0][1] = yVec;
+
+        //right
+        wallLocations[1][0] = new Vector2(windowDimensions.x() - WALL_WIDTH, 0);
+        wallLocations[1][1] = yVec;
+
+        //top
+        wallLocations[2][0] = Vector2.ZERO;
+        wallLocations[2][1] = new Vector2(windowDimensions.x(), WALL_HEIGHT);
+
+        for(Vector2[] wallLocation: wallLocations)
+        {
+            GameObject wall = new GameObject(wallLocation[0], wallLocation[1], null);
+            gameObjects().addGameObject(wall, Layer.STATIC_OBJECTS);
+        }
     }
 
     private void createBackground(ImageReader imageReader) {
