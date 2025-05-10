@@ -29,7 +29,7 @@ public class BrickerGameManager extends GameManager {
 
     // Bricks
     private static final int BRICKS_IN_ROW = 8;
-//    private static final int ROWS = 7;
+    //    private static final int ROWS = 7;
     private static final int ROWS = 2;
     private static final int BRICK_HEIGHT = 15;
     private static final int BRICK_X_GAP = 2;
@@ -38,7 +38,6 @@ public class BrickerGameManager extends GameManager {
     // Paddle
     private static final Vector2 PADDLE_SIZE = new Vector2(200, 20);
     private static final int PADDLE_Y_OFFSET = 30;
-
 
 
     // Walls
@@ -65,7 +64,7 @@ public class BrickerGameManager extends GameManager {
     private final int bricksInRow;
     private final int rows;
 
-    private Ball ball;
+    private Ball mainBall;
     private HeartBar heartBar;
     private Counter brickCounter;
 
@@ -76,6 +75,8 @@ public class BrickerGameManager extends GameManager {
     private UserInputListener inputListener;
 
     private final Random rand;
+
+    private Ball[] otherBalls;
 
     public static void main(String[] args) {
         int bricksInRow = BRICKS_IN_ROW;
@@ -95,6 +96,8 @@ public class BrickerGameManager extends GameManager {
         this.rows = rows;
 
         rand = new Random();
+
+        otherBalls = new Ball[100];
     }
 
     @Override
@@ -103,6 +106,7 @@ public class BrickerGameManager extends GameManager {
 
         if (checkWCondition()) return;
         checkBallOutOfBounds();
+        checkOtherBallsOutOfBounds();
         checkGameEndConditions();
     }
 
@@ -121,11 +125,16 @@ public class BrickerGameManager extends GameManager {
         createBackground(imageReader);
         createBrickGrid(imageReader);
         createHeartBar(imageReader);
+
+        for (int i = 0; i < otherBalls.length; i++) {
+            otherBalls[i] = null;
+        }
     }
 
     /**
      * removes a game object from the game
-     * @param obj a game object to remove
+     *
+     * @param obj     a game object to remove
      * @param layerID the layerID to remove object from
      * @return true if found object and removed it.
      */
@@ -135,14 +144,29 @@ public class BrickerGameManager extends GameManager {
 
     /**
      * adds a GameObject to the gameObjects of the game.
+     *
      * @param obj object to be added.
      */
     public void addGameObject(GameObject obj) {
         gameObjects().addGameObject(obj);
+        if (obj instanceof Ball) {
+            addOtherBall((Ball) obj);
+        }
+    }
+
+    private void addOtherBall(Ball ball) {
+        for (int i = 0; i < otherBalls.length; i++) {
+            if (otherBalls[i] == null) {
+                otherBalls[i] = ball;
+                System.out.println(String.format("placed otehr ball at %d", i));
+                break;
+            }
+        }
     }
 
     /**
      * image reader getter.
+     *
      * @return image getter
      */
     public ImageReader getImageReader() {
@@ -151,6 +175,7 @@ public class BrickerGameManager extends GameManager {
 
     /**
      * image reader getter.
+     *
      * @return image getter
      */
     public SoundReader getSoundReader() {
@@ -165,11 +190,28 @@ public class BrickerGameManager extends GameManager {
         return false;
     }
 
+    private boolean isOutOfBounds(Ball ball) {
+        return ball.getTopLeftCorner().y() > windowDimensions.y();
+    }
+
     private void checkBallOutOfBounds() {
-        if (ball.getTopLeftCorner().y() > windowDimensions.y()) {
+        if (isOutOfBounds(mainBall)) {
             heartBar.removeHeart();
-            gameObjects().removeGameObject(ball);
+            gameObjects().removeGameObject(mainBall);
             createBall(imageReader, soundReader);
+        }
+    }
+
+    private void checkOtherBallsOutOfBounds() {
+        for (int i = 0; i < otherBalls.length; i++) {
+            if (otherBalls[i] == null) {
+                continue;
+            }
+            Ball currentBall = otherBalls[i];
+            if (isOutOfBounds(currentBall)) {
+                otherBalls[i] = null;
+                gameObjects().removeGameObject(currentBall);
+            }
         }
     }
 
@@ -245,9 +287,9 @@ public class BrickerGameManager extends GameManager {
     private void createBall(ImageReader imageReader, SoundReader soundReader) {
         Renderable ballImage = imageReader.readImage(BallParameters.BALL_IMAGE_PATH, true);
         Sound collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
-        ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
-        setRandomBallSpeed(ball);
-        gameObjects().addGameObject(ball);
+        mainBall = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
+        setRandomBallSpeed(mainBall);
+        gameObjects().addGameObject(mainBall);
     }
 
     private void setRandomBallSpeed(Ball ball) {
@@ -276,8 +318,7 @@ public class BrickerGameManager extends GameManager {
         wallLocations[2][0] = Vector2.ZERO;
         wallLocations[2][1] = new Vector2(windowDimensions.x(), WALL_HEIGHT);
 
-        for(Vector2[] wallLocation: wallLocations)
-        {
+        for (Vector2[] wallLocation : wallLocations) {
             GameObject wall = new GameObject(wallLocation[0], wallLocation[1], null);
             gameObjects().addGameObject(wall, Layer.STATIC_OBJECTS);
         }
