@@ -21,7 +21,7 @@ import java.util.Random;
 public class BrickerGameManager extends GameManager {
 
     // Game Settings
-    private static final String GAME_TITLE = "title";
+    private static final String GAME_TITLE = "Bricker";
     private static final Vector2 WINDOW_SIZE = new Vector2(700, 500);
 
     // Bricks
@@ -30,12 +30,6 @@ public class BrickerGameManager extends GameManager {
     private static final int BRICK_HEIGHT = 15;
     private static final int BRICK_X_GAP = 2;
     private static final int BRICK_Y_GAP = 2;
-
-    // Hearts
-    private static final int INITIAL_HEARTS = 3;
-    private static final int MAX_HEARTS = 4;
-    private static final Vector2 HEART_SIZE = new Vector2(20, 20);
-    private static final Vector2 HEART_BAR_POSITION_OFFSET = new Vector2(10, 0);
 
     // Paddle
     private static final Vector2 PADDLE_SIZE = new Vector2(200, 20);
@@ -48,6 +42,12 @@ public class BrickerGameManager extends GameManager {
     // Walls
     private static final int WALL_WIDTH = 10;
     private static final int WALL_HEIGHT = 10;
+
+    // Hearts
+    private static final int INITIAL_HEARTS = 3;
+    private static final int MAX_HEARTS = 4;
+    private static final Vector2 HEART_SIZE = new Vector2(20, 20);
+    private static final Vector2 HEART_BAR_POSITION_OFFSET = new Vector2(WALL_WIDTH, 0);
 
     // Assets
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
@@ -67,11 +67,12 @@ public class BrickerGameManager extends GameManager {
 
     private Ball ball;
     private HeartBar heartBar;
+    private Counter brickCounter;
+
     private Vector2 windowDimensions;
     private ImageReader imageReader;
     private SoundReader soundReader;
     private WindowController windowController;
-    private Counter brickCounter;
     private UserInputListener inputListener;
 
     public static void main(String[] args) {
