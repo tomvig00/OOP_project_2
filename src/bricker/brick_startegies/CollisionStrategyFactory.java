@@ -14,6 +14,8 @@ public class CollisionStrategyFactory {
                 return new AddPuckStrategy(baseStrategy, manager);
             case ADD_PADDLE:
                 return new AddPaddleStrategy(baseStrategy, manager);
+            case ENTER_TURBO:
+            return new EnterTurboStrategy(baseStrategy, manager);
         }
         return null;
     }

@@ -59,7 +59,9 @@ public class Paddle extends GameObject {
 
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
-        collisionCounter++;
+        if (other instanceof Ball) {
+            collisionCounter++;
+        }
     }
 
     public int getCollisionCounter() {

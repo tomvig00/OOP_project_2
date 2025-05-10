@@ -13,27 +13,35 @@ import danogl.gui.*;
 
 import java.util.Random;
 
-public class AddPuckStrategy implements CollisionStrategyDecorator{
+public class AddPuckStrategy extends CollisionStrategyDecorator{
     private final int BALL_AMOUNT = 2;
     private final static float SIZE_FACTOR = 0.75f;
     private final String BALL_IMAGE_PATH = "assets/mockBall.png";
     private final String BALL_SOUND_PATH = "assets/blop.wav";
 
-    private final CollisionStrategy baseStrategy;
-    private final BrickerGameManager manager;
+    private static Renderable ballImage = null;
+    private static Sound ballSound = null;
 
     private static Random rand;
 
 
     public AddPuckStrategy(CollisionStrategy baseStrategy, BrickerGameManager manager) {
-        this.baseStrategy = baseStrategy;
-        this.manager = manager;
+        super(baseStrategy, manager);
         rand = new Random();
+
+        if(ballImage == null)
+        {
+            ballImage = manager.getImageReader().readImage(BALL_IMAGE_PATH, true);
+        }
+
+        if(ballSound == null)
+        {
+            ballSound = manager.getSoundReader().readSound(BALL_SOUND_PATH);
+        }
     }
 
     @Override
-    public void onCollision(GameObject obj1, GameObject obj2) {
-        baseStrategy.onCollision(obj1, obj2);
+    public void strategyOnCollision(GameObject obj1, GameObject obj2) {
         addMoreBalls(obj1.getCenter());
     }
 
@@ -45,9 +53,7 @@ public class AddPuckStrategy implements CollisionStrategyDecorator{
     }
 
     private void addPuckBall(Vector2 spawnAt) {
-        Renderable ballImage = manager.getImageReader().readImage(BALL_IMAGE_PATH, true);
-        Sound collisionSound = manager.getSoundReader().readSound(BALL_SOUND_PATH);
-        Ball ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE.mult(SIZE_FACTOR), ballImage, collisionSound);
+        Ball ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE.mult(SIZE_FACTOR), ballImage, ballSound);
         setRandomBallSpeed(ball);
         ball.setCenter(spawnAt);
         manager.addGameObject(ball);

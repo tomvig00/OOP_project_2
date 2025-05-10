@@ -3,6 +3,7 @@ package bricker.main;
 import bricker.brick_startegies.BasicCollisionStrategy;
 import bricker.brick_startegies.CollisionStrategy;
 import bricker.brick_startegies.CollisionStrategyFactory;
+import bricker.game_parameters.TurboParams;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.HeartBar;
 import bricker.gameobjects.Paddle;
@@ -16,7 +17,7 @@ import danogl.util.Counter;
 import danogl.util.Vector2;
 import bricker.gameobjects.Ball;
 import bricker.game_parameters.BallParameters;
-import bricker.game_parameters.gameRules;
+import bricker.game_parameters.GameRules;
 
 
 import java.awt.event.KeyEvent;
@@ -57,6 +58,11 @@ public class BrickerGameManager extends GameManager {
     private static final String BRICK_IMAGE_PATH = "assets/brick.png";
     private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
 
+    private Renderable turboImage;
+    private Renderable ballImage;
+    private Sound collisionSound;
+    private Renderable paddleImage;
+
     // Messages
     private static final String MESSAGE_WIN = "You Win!";
     private static final String MESSAGE_LOSE = "You Lose!";
@@ -71,6 +77,9 @@ public class BrickerGameManager extends GameManager {
     private Ball[] otherBalls;
     private Paddle mainPaddle;
     private Paddle extraPaddle;
+
+    private boolean isInTurbo = false;
+    private int counterWhenturboStarted = 0;
 
     private Vector2 windowDimensions;
     private ImageReader imageReader;
@@ -111,7 +120,10 @@ public class BrickerGameManager extends GameManager {
         checkBallOutOfBounds();
         checkOtherBallsOutOfBounds();
         checkExtraPaddleExpiration();
+        checkTurboExpiration();
         checkGameEndConditions();
+
+        System.out.println(String.format("left amount %d", brickCounter.value()));
     }
 
     @Override
@@ -123,13 +135,21 @@ public class BrickerGameManager extends GameManager {
         this.windowController = windowController;
         this.windowDimensions = windowController.getWindowDimensions();
 
-        createBall(imageReader, soundReader);
-        createPaddle(imageReader, inputListener, false);
+        // loading assets
+        ballImage = imageReader.readImage(BallParameters.BALL_IMAGE_PATH, true);
+        turboImage = imageReader.readImage(TurboParams.TURBO_IMAGE_PATH, true);
+        collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
+        paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
+
+        createBall();
+        createPaddle(inputListener, false);
         extraPaddle = null;
         createWalls();
         createBackground(imageReader);
         createBrickGrid(imageReader);
         createHeartBar(imageReader);
+
+
 
         for (int i = 0; i < otherBalls.length; i++) {
             otherBalls[i] = null;
@@ -160,17 +180,18 @@ public class BrickerGameManager extends GameManager {
     }
 
     public void createAdditionalPaddle() {
-        createPaddle(imageReader, inputListener, true);
+        createPaddle(inputListener, true);
     }
 
-    private void addOtherBall(Ball ball) {
-        for (int i = 0; i < otherBalls.length; i++) {
-            if (otherBalls[i] == null) {
-                otherBalls[i] = ball;
-                System.out.println(String.format("placed otehr ball at %d", i));
-                break;
-            }
+    public void enterTurboMode() {
+        if(isInTurbo) {
+            return;
         }
+        isInTurbo = true;
+        mainBall.renderer().setRenderable(turboImage);
+        mainBall.setVelocity(mainBall.getVelocity().mult(TurboParams.TURBO_FACTOR));
+
+        counterWhenturboStarted = mainBall.getCollisionCounter();
     }
 
     /**
@@ -191,6 +212,20 @@ public class BrickerGameManager extends GameManager {
         return soundReader;
     }
 
+    public boolean isMainBall(GameObject obj) {
+        return obj == mainBall;
+    }
+
+    private void addOtherBall(Ball ball) {
+        for (int i = 0; i < otherBalls.length; i++) {
+            if (otherBalls[i] == null) {
+                otherBalls[i] = ball;
+                System.out.println(String.format("placed otehr ball at %d", i));
+                break;
+            }
+        }
+    }
+
     private boolean checkWCondition() {
         if (inputListener.isKeyPressed(KeyEvent.VK_W)) {
             handleEndGame(MESSAGE_WIN);
@@ -207,7 +242,7 @@ public class BrickerGameManager extends GameManager {
         if (isOutOfBounds(mainBall)) {
             heartBar.removeHeart();
             gameObjects().removeGameObject(mainBall);
-            createBall(imageReader, soundReader);
+            createBall();
         }
     }
 
@@ -229,9 +264,18 @@ public class BrickerGameManager extends GameManager {
             return;
         }
 
-        if (extraPaddle.getCollisionCounter() >= gameRules.MAX_EXTRA_PADDLE_HITS) {
+        if (extraPaddle.getCollisionCounter() >= GameRules.MAX_EXTRA_PADDLE_HITS) {
             gameObjects().removeGameObject(extraPaddle);
             extraPaddle = null;
+        }
+    }
+
+    private void checkTurboExpiration() {
+        if(!isInTurbo) {
+            return;
+        }
+        if(mainBall.getCollisionCounter() >= TurboParams.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
+            exitTurboMode();
         }
     }
 
@@ -293,10 +337,9 @@ public class BrickerGameManager extends GameManager {
         brickCounter.increment();
     }
 
-    private Paddle createPaddleAtHeight(ImageReader imageReader, UserInputListener inputListener, float yCoordinate) {
+    private Paddle createPaddleAtHeight(UserInputListener inputListener, float yCoordinate) {
         float leftBorder = WALL_WIDTH;
         float rightBorder = windowDimensions.x() - WALL_WIDTH;
-        Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
         Paddle paddle = new Paddle(Vector2.ZERO, PADDLE_SIZE, paddleImage, inputListener,
                 leftBorder, rightBorder);
         paddle.setCenter(new Vector2(windowDimensions.x() / 2,
@@ -305,7 +348,7 @@ public class BrickerGameManager extends GameManager {
         return paddle;
     }
 
-    private void createPaddle(ImageReader imageReader, UserInputListener inputListener, boolean isAdditional) {
+    private void createPaddle(UserInputListener inputListener, boolean isAdditional) {
         // extra already exists
         if (isAdditional && extraPaddle != null) {
             return;
@@ -315,7 +358,7 @@ public class BrickerGameManager extends GameManager {
         if (isAdditional) {
             yCoordinate /= 2;
         }
-        Paddle paddle = createPaddleAtHeight(imageReader, inputListener, yCoordinate);
+        Paddle paddle = createPaddleAtHeight(inputListener, yCoordinate);
         if (isAdditional) {
             extraPaddle = paddle;
         } else {
@@ -324,9 +367,7 @@ public class BrickerGameManager extends GameManager {
 
     }
 
-    private void createBall(ImageReader imageReader, SoundReader soundReader) {
-        Renderable ballImage = imageReader.readImage(BallParameters.BALL_IMAGE_PATH, true);
-        Sound collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
+    private void createBall() {
         mainBall = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
         setRandomBallSpeed(mainBall);
         gameObjects().addGameObject(mainBall);
@@ -369,5 +410,14 @@ public class BrickerGameManager extends GameManager {
         GameObject background = new GameObject(Vector2.ZERO, windowDimensions, backgroundImage);
         background.setCoordinateSpace(CoordinateSpace.CAMERA_COORDINATES);
         gameObjects().addGameObject(background, Layer.BACKGROUND);
+    }
+
+    private void exitTurboMode() {
+        if(!isInTurbo) {
+            return;
+        }
+        isInTurbo = false;
+        mainBall.renderer().setRenderable(ballImage);
+        mainBall.setVelocity(mainBall.getVelocity().mult(1.0f / TurboParams.TURBO_FACTOR));
     }
 }

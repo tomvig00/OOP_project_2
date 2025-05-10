@@ -15,4 +15,5 @@ public class BallParameters {
 
     // basic ball size
     public static final Vector2 BALL_SIZE = new Vector2(50, 50);
+
 }
