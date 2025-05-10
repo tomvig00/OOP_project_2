@@ -9,7 +9,7 @@ import danogl.util.Counter;
 
 /**
  * this class represents the collision strategy with a basic block.
- * @author tal.ronen1,
+ * @author tal.ronen1, tomvig00
  */
 public class BasicCollisionStrategy implements CollisionStrategy {
 

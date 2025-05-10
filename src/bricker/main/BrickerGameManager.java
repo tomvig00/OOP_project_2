@@ -2,6 +2,7 @@ package bricker.main;
 
 import bricker.brick_startegies.BasicCollisionStrategy;
 import bricker.brick_startegies.CollisionStrategy;
+import bricker.brick_startegies.CollisionStrategyFactory;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.HeartBar;
 import bricker.gameobjects.Paddle;
@@ -14,6 +15,8 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 import bricker.gameobjects.Ball;
+import bricker.game_parameters.BallParameters;
+
 
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -36,9 +39,7 @@ public class BrickerGameManager extends GameManager {
     private static final Vector2 PADDLE_SIZE = new Vector2(200, 20);
     private static final int PADDLE_Y_OFFSET = 30;
 
-    // Ball
-    private static final float BALL_SPEED = 250;
-    private static final Vector2 BALL_SIZE = new Vector2(50, 50);
+
 
     // Walls
     private static final int WALL_WIDTH = 10;
@@ -53,10 +54,8 @@ public class BrickerGameManager extends GameManager {
     // Assets
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
     private static final String HEART_IMAGE_PATH = "assets/heart.png";
-    private static final String BALL_IMAGE_PATH = "assets/ball.png";
     private static final String BRICK_IMAGE_PATH = "assets/brick.png";
     private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
-    private static final String BALL_SOUND_PATH = "assets/blop.wav";
 
     // Messages
     private static final String MESSAGE_WIN = "You Win!";
@@ -76,6 +75,8 @@ public class BrickerGameManager extends GameManager {
     private WindowController windowController;
     private UserInputListener inputListener;
 
+    private final Random rand;
+
     public static void main(String[] args) {
         int bricksInRow = BRICKS_IN_ROW;
         int rows = ROWS;
@@ -92,6 +93,8 @@ public class BrickerGameManager extends GameManager {
         super(windowTitle, windowDimensions);
         this.bricksInRow = bricksInRow;
         this.rows = rows;
+
+        rand = new Random();
     }
 
     @Override
@@ -128,6 +131,30 @@ public class BrickerGameManager extends GameManager {
      */
     public boolean removeGameObject(GameObject obj, int layerID) {
         return gameObjects().removeGameObject(obj, layerID);
+    }
+
+    /**
+     * adds a GameObject to the gameObjects of the game.
+     * @param obj object to be added.
+     */
+    public void addGameObject(GameObject obj) {
+        gameObjects().addGameObject(obj);
+    }
+
+    /**
+     * image reader getter.
+     * @return image getter
+     */
+    public ImageReader getImageReader() {
+        return imageReader;
+    }
+
+    /**
+     * image reader getter.
+     * @return image getter
+     */
+    public SoundReader getSoundReader() {
+        return soundReader;
     }
 
     private boolean checkWCondition() {
@@ -183,10 +210,17 @@ public class BrickerGameManager extends GameManager {
             for (int col = 0; col < bricksInRow; col++) {
                 float x = WALL_WIDTH + BRICK_X_GAP + col * (brickWidth + BRICK_X_GAP);
                 float y = WALL_HEIGHT + BRICK_Y_GAP + row * (BRICK_HEIGHT + BRICK_Y_GAP);
+                CollisionStrategy strategy = getRandomStrategy();
                 createBrick(imageReader, new Vector2(x, y), brickSize,
-                        new BasicCollisionStrategy(this, brickCounter));
+                        strategy);
             }
         }
+    }
+
+    private CollisionStrategy getRandomStrategy() {
+        CollisionStrategy baseStrategy = new BasicCollisionStrategy(this, brickCounter);
+//        return baseStrategy;
+        return CollisionStrategyFactory.generateRandomStrategy(baseStrategy, this);
     }
 
     private void createBrick(ImageReader imageReader, Vector2 topLeftPosition, Vector2 dimensions,
@@ -209,17 +243,16 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void createBall(ImageReader imageReader, SoundReader soundReader) {
-        Renderable ballImage = imageReader.readImage(BALL_IMAGE_PATH, true);
-        Sound collisionSound = soundReader.readSound(BALL_SOUND_PATH);
-        ball = new Ball(Vector2.ZERO, BALL_SIZE, ballImage, collisionSound);
+        Renderable ballImage = imageReader.readImage(BallParameters.BALL_IMAGE_PATH, true);
+        Sound collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
+        ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
         setRandomBallSpeed(ball);
         gameObjects().addGameObject(ball);
     }
 
     private void setRandomBallSpeed(Ball ball) {
-        float ballVelX = BALL_SPEED;
-        float ballVelY = BALL_SPEED;
-        Random rand = new Random();
+        float ballVelX = BallParameters.BALL_SPEED;
+        float ballVelY = BallParameters.BALL_SPEED;
         if (rand.nextBoolean()) ballVelX *= -1;
         if (rand.nextBoolean()) ballVelY *= -1;
         ball.setVelocity(new Vector2(ballVelX, ballVelY));
