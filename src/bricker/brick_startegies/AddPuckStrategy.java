@@ -1,19 +1,16 @@
 package bricker.brick_startegies;
 
 import bricker.game_parameters.BallParameters;
-import bricker.gameobjects.Ball;
+import bricker.game_objects.Ball;
 import bricker.main.BrickerGameManager;
 import danogl.GameObject;
-import danogl.gui.ImageReader;
 import danogl.gui.Sound;
-import danogl.gui.SoundReader;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-import danogl.gui.*;
 
 import java.util.Random;
 
-public class AddPuckStrategy extends CollisionStrategyDecorator{
+public class AddPuckStrategy extends CollisionStrategyDecorator {
     private final int BALL_AMOUNT = 2;
     private final static float SIZE_FACTOR = 0.75f;
     private final String BALL_IMAGE_PATH = "assets/mockBall.png";
@@ -29,13 +26,11 @@ public class AddPuckStrategy extends CollisionStrategyDecorator{
         super(baseStrategy, manager);
         rand = new Random();
 
-        if(ballImage == null)
-        {
+        if (ballImage == null) {
             ballImage = manager.getImageReader().readImage(BALL_IMAGE_PATH, true);
         }
 
-        if(ballSound == null)
-        {
+        if (ballSound == null) {
             ballSound = manager.getSoundReader().readSound(BALL_SOUND_PATH);
         }
     }
@@ -46,8 +41,7 @@ public class AddPuckStrategy extends CollisionStrategyDecorator{
     }
 
     private void addMoreBalls(Vector2 spawnAt) {
-        for(int i=0; i < BALL_AMOUNT; i++)
-        {
+        for (int i = 0; i < BALL_AMOUNT; i++) {
             addPuckBall(spawnAt);
         }
     }
@@ -56,10 +50,10 @@ public class AddPuckStrategy extends CollisionStrategyDecorator{
         Ball ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE.mult(SIZE_FACTOR), ballImage, ballSound);
         setRandomBallSpeed(ball);
         ball.setCenter(spawnAt);
-        manager.addGameObject(ball);
+        manager.addGameObject(ball, true);
     }
 
-    private void setRandomBallSpeed(Ball ball ) {
+    private void setRandomBallSpeed(Ball ball) {
         double angle = rand.nextDouble() * Math.PI;
         float velocityX = (float) Math.cos(angle) * BallParameters.BALL_SPEED;
         float velocityY = (float) Math.sin(angle) * BallParameters.BALL_SPEED;

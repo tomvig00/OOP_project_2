@@ -3,10 +3,11 @@ package bricker.main;
 import bricker.brick_startegies.BasicCollisionStrategy;
 import bricker.brick_startegies.CollisionStrategy;
 import bricker.brick_startegies.CollisionStrategyFactory;
+import bricker.game_parameters.HeartParameters;
 import bricker.game_parameters.TurboParams;
-import bricker.gameobjects.Brick;
-import bricker.gameobjects.HeartBar;
-import bricker.gameobjects.Paddle;
+import bricker.game_objects.Brick;
+import bricker.game_objects.HeartBar;
+import bricker.game_objects.Paddle;
 import danogl.GameManager;
 import danogl.GameObject;
 import danogl.collisions.Layer;
@@ -15,13 +16,14 @@ import danogl.gui.*;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
-import bricker.gameobjects.Ball;
+import bricker.game_objects.Ball;
 import bricker.game_parameters.BallParameters;
 import bricker.game_parameters.GameRules;
 
 
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import java.util.Vector;
 
 public class BrickerGameManager extends GameManager {
 
@@ -49,12 +51,10 @@ public class BrickerGameManager extends GameManager {
     // Hearts
     private static final int INITIAL_HEARTS = 3;
     private static final int MAX_HEARTS = 4;
-    private static final Vector2 HEART_SIZE = new Vector2(20, 20);
     private static final Vector2 HEART_BAR_POSITION_OFFSET = new Vector2(WALL_WIDTH, 0);
 
     // Assets
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
-    private static final String HEART_IMAGE_PATH = "assets/heart.png";
     private static final String BRICK_IMAGE_PATH = "assets/brick.png";
     private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
 
@@ -74,7 +74,8 @@ public class BrickerGameManager extends GameManager {
     private Ball mainBall;
     private HeartBar heartBar;
     private Counter brickCounter;
-    private Ball[] otherBalls;
+    //    private Ball[] otherBalls;
+    private final Vector<GameObject> movingObjects;
     private Paddle mainPaddle;
     private Paddle extraPaddle;
 
@@ -109,7 +110,8 @@ public class BrickerGameManager extends GameManager {
 
         rand = new Random();
 
-        otherBalls = new Ball[100];
+//        otherBalls = new Ball[100];
+        movingObjects = new Vector<GameObject>();
     }
 
     @Override
@@ -118,12 +120,10 @@ public class BrickerGameManager extends GameManager {
 
         if (checkWCondition()) return;
         checkBallOutOfBounds();
-        checkOtherBallsOutOfBounds();
+        checkMovingObjectsOutOfBounds();
         checkExtraPaddleExpiration();
         checkTurboExpiration();
         checkGameEndConditions();
-
-        System.out.println(String.format("left amount %d", brickCounter.value()));
     }
 
     @Override
@@ -148,12 +148,6 @@ public class BrickerGameManager extends GameManager {
         createBackground(imageReader);
         createBrickGrid(imageReader);
         createHeartBar(imageReader);
-
-
-
-        for (int i = 0; i < otherBalls.length; i++) {
-            otherBalls[i] = null;
-        }
     }
 
     /**
@@ -171,11 +165,12 @@ public class BrickerGameManager extends GameManager {
      * adds a GameObject to the gameObjects of the game.
      *
      * @param obj object to be added.
+     * @param checkOutOfBounds - if true, remove object when it's out of screen.
      */
-    public void addGameObject(GameObject obj) {
+    public void addGameObject(GameObject obj, boolean checkOutOfBounds) {
         gameObjects().addGameObject(obj);
-        if (obj instanceof Ball) {
-            addOtherBall((Ball) obj);
+        if(checkOutOfBounds) {
+            movingObjects.add(obj);
         }
     }
 
@@ -184,7 +179,7 @@ public class BrickerGameManager extends GameManager {
     }
 
     public void enterTurboMode() {
-        if(isInTurbo) {
+        if (isInTurbo) {
             return;
         }
         isInTurbo = true;
@@ -216,15 +211,14 @@ public class BrickerGameManager extends GameManager {
         return obj == mainBall;
     }
 
-    private void addOtherBall(Ball ball) {
-        for (int i = 0; i < otherBalls.length; i++) {
-            if (otherBalls[i] == null) {
-                otherBalls[i] = ball;
-                System.out.println(String.format("placed otehr ball at %d", i));
-                break;
-            }
-        }
+    public boolean isMainPaddle(GameObject obj) {
+        return obj == mainPaddle;
     }
+
+    public void addLife() {
+        heartBar.addHeart();
+    }
+
 
     private boolean checkWCondition() {
         if (inputListener.isKeyPressed(KeyEvent.VK_W)) {
@@ -234,8 +228,8 @@ public class BrickerGameManager extends GameManager {
         return false;
     }
 
-    private boolean isOutOfBounds(Ball ball) {
-        return ball.getTopLeftCorner().y() > windowDimensions.y();
+    private boolean isOutOfBounds(GameObject obj) {
+        return obj.getTopLeftCorner().y() > windowDimensions.y();
     }
 
     private void checkBallOutOfBounds() {
@@ -246,16 +240,17 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
-    private void checkOtherBallsOutOfBounds() {
-        for (int i = 0; i < otherBalls.length; i++) {
-            if (otherBalls[i] == null) {
-                continue;
+    private void checkMovingObjectsOutOfBounds() {
+        Vector<GameObject> toBeRemoved = new Vector<>();
+        for (GameObject obj : movingObjects) {
+            if (isOutOfBounds(obj)) {
+                toBeRemoved.add(obj);
             }
-            Ball currentBall = otherBalls[i];
-            if (isOutOfBounds(currentBall)) {
-                otherBalls[i] = null;
-                gameObjects().removeGameObject(currentBall);
-            }
+        }
+
+        for (GameObject obj : toBeRemoved) {
+            movingObjects.remove(obj);
+            gameObjects().removeGameObject(obj);
         }
     }
 
@@ -271,10 +266,10 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void checkTurboExpiration() {
-        if(!isInTurbo) {
+        if (!isInTurbo) {
             return;
         }
-        if(mainBall.getCollisionCounter() >= TurboParams.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
+        if (mainBall.getCollisionCounter() >= TurboParams.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
             exitTurboMode();
         }
     }
@@ -297,12 +292,13 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void createHeartBar(ImageReader imageReader) {
-        Renderable heartImage = imageReader.readImage(HEART_IMAGE_PATH, true);
+        Renderable heartImage = imageReader.readImage(HeartParameters.HEART_IMAGE_PATH, true);
         Vector2 heartBarPosition = new Vector2(
                 HEART_BAR_POSITION_OFFSET.x(),
-                windowDimensions.y() - HEART_SIZE.y()
+                windowDimensions.y() - HeartParameters.HEART_SIZE.y()
         );
-        heartBar = new HeartBar(heartBarPosition, HEART_SIZE, heartImage, MAX_HEARTS, INITIAL_HEARTS, gameObjects());
+        heartBar = new HeartBar(heartBarPosition, HeartParameters.HEART_SIZE, heartImage, MAX_HEARTS,
+                INITIAL_HEARTS, gameObjects());
     }
 
     private void createBrickGrid(ImageReader imageReader) {
@@ -325,7 +321,6 @@ public class BrickerGameManager extends GameManager {
 
     private CollisionStrategy getRandomStrategy() {
         CollisionStrategy baseStrategy = new BasicCollisionStrategy(this, brickCounter);
-//        return baseStrategy;
         return CollisionStrategyFactory.generateRandomStrategy(baseStrategy, this);
     }
 
@@ -413,7 +408,7 @@ public class BrickerGameManager extends GameManager {
     }
 
     private void exitTurboMode() {
-        if(!isInTurbo) {
+        if (!isInTurbo) {
             return;
         }
         isInTurbo = false;

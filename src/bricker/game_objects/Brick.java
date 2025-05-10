@@ -1,10 +1,9 @@
-package bricker.gameobjects;
+package bricker.game_objects;
 
 import bricker.brick_startegies.CollisionStrategy;
 import danogl.GameObject;
 import danogl.collisions.Collision;
 import danogl.gui.rendering.Renderable;
-import danogl.util.Counter;
 import danogl.util.Vector2;
 
 public class Brick extends GameObject {
