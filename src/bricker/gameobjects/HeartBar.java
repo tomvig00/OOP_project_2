@@ -34,9 +34,8 @@ public class HeartBar extends GameObject {
     private final int maxHearts;
     private final GameObjectCollection gameObjects;
 
-    private GameObject numberDisplay;
+    private final GameObject numberDisplay;
     private final TextRenderable numberText;
-    private final Vector2 numberPosition;
 
     public HeartBar(Vector2 topLeftCorner,
                     Vector2 heartSize,
@@ -54,7 +53,7 @@ public class HeartBar extends GameObject {
         // Create numeric display in the first slot
         numberText = new TextRenderable(String.valueOf(initialHearts));
         numberText.setColor(COLOR_FULL);
-        numberPosition = topLeftCorner.getImmutableCopy();
+        Vector2 numberPosition = topLeftCorner.getImmutableCopy();
         numberDisplay = new GameObject(numberPosition, heartSize, numberText);
         gameObjects.addGameObject(numberDisplay, Layer.UI);
 
@@ -98,7 +97,6 @@ public class HeartBar extends GameObject {
 
     private void updateNumberText() {
         int current = getCurrentHearts();
-        gameObjects.removeGameObject(numberDisplay, Layer.UI);
         numberText.setString(String.valueOf(current));
 
         if (current >= HEART_THRESHOLD_FULL) {
@@ -109,7 +107,6 @@ public class HeartBar extends GameObject {
             numberText.setColor(COLOR_LOW);
         }
 
-        numberDisplay = new GameObject(numberPosition, heartSize, numberText);
-        gameObjects.addGameObject(numberDisplay, Layer.UI);
+        numberDisplay.renderer().setRenderable(numberText);
     }
 }
