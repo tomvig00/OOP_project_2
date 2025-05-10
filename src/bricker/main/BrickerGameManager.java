@@ -26,7 +26,8 @@ public class BrickerGameManager extends GameManager {
 
     // Bricks
     private static final int BRICKS_IN_ROW = 8;
-    private static final int ROWS = 7;
+//    private static final int ROWS = 7;
+    private static final int ROWS = 2;
     private static final int BRICK_HEIGHT = 15;
     private static final int BRICK_X_GAP = 2;
     private static final int BRICK_Y_GAP = 2;
@@ -102,6 +103,33 @@ public class BrickerGameManager extends GameManager {
         checkGameEndConditions();
     }
 
+    @Override
+    public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener, WindowController windowController) {
+        this.inputListener = inputListener;
+        super.initializeGame(imageReader, soundReader, inputListener, windowController);
+        this.imageReader = imageReader;
+        this.soundReader = soundReader;
+        this.windowController = windowController;
+        this.windowDimensions = windowController.getWindowDimensions();
+
+        createBall(imageReader, soundReader);
+        createPaddle(imageReader, inputListener);
+        createWalls();
+        createBackground(imageReader);
+        createBrickGrid(imageReader);
+        createHeartBar(imageReader);
+    }
+
+    /**
+     * removes a game object from the game
+     * @param obj a game object to remove
+     * @param layerID the layerID to remove object from
+     * @return true if found object and removed it.
+     */
+    public boolean removeGameObject(GameObject obj, int layerID) {
+        return gameObjects().removeGameObject(obj, layerID);
+    }
+
     private boolean checkWCondition() {
         if (inputListener.isKeyPressed(KeyEvent.VK_W)) {
             handleEndGame(MESSAGE_WIN);
@@ -135,23 +163,6 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
-    @Override
-    public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener, WindowController windowController) {
-        this.inputListener = inputListener;
-        super.initializeGame(imageReader, soundReader, inputListener, windowController);
-        this.imageReader = imageReader;
-        this.soundReader = soundReader;
-        this.windowController = windowController;
-        this.windowDimensions = windowController.getWindowDimensions();
-
-        createBall(imageReader, soundReader);
-        createPaddle(imageReader, inputListener);
-        createWalls();
-        createBackground(imageReader);
-        createBrickGrid(imageReader);
-        createHeartBar(imageReader);
-    }
-
     private void createHeartBar(ImageReader imageReader) {
         Renderable heartImage = imageReader.readImage(HEART_IMAGE_PATH, true);
         Vector2 heartBarPosition = new Vector2(
@@ -166,14 +177,14 @@ public class BrickerGameManager extends GameManager {
         float totalGapWidth = (bricksInRow + 1) * BRICK_X_GAP;
         float brickWidth = (availableWidth - totalGapWidth) / bricksInRow;
         Vector2 brickSize = new Vector2(brickWidth, BRICK_HEIGHT);
-        brickCounter = new Counter(bricksInRow * rows);
+        brickCounter = new Counter(0);
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < bricksInRow; col++) {
                 float x = WALL_WIDTH + BRICK_X_GAP + col * (brickWidth + BRICK_X_GAP);
                 float y = WALL_HEIGHT + BRICK_Y_GAP + row * (BRICK_HEIGHT + BRICK_Y_GAP);
                 createBrick(imageReader, new Vector2(x, y), brickSize,
-                        new BasicCollisionStrategy(gameObjects(), brickCounter));
+                        new BasicCollisionStrategy(this, brickCounter));
             }
         }
     }
@@ -183,6 +194,7 @@ public class BrickerGameManager extends GameManager {
         Renderable brickImage = imageReader.readImage(BRICK_IMAGE_PATH, false);
         Brick brick = new Brick(topLeftPosition, dimensions, brickImage, collisionStrategy);
         gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
+        brickCounter.increment();
     }
 
     private void createPaddle(ImageReader imageReader, UserInputListener inputListener) {
