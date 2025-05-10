@@ -12,6 +12,8 @@ public class CollisionStrategyFactory {
         switch (strategyEnum) {
             case ADD_PUCK:
                 return new AddPuckStrategy(baseStrategy, manager);
+            case ADD_PADDLE:
+                return new AddPaddleStrategy(baseStrategy, manager);
         }
         return null;
     }

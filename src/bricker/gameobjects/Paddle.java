@@ -1,6 +1,7 @@
 package bricker.gameobjects;
 
 import danogl.GameObject;
+import danogl.collisions.Collision;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
@@ -13,6 +14,7 @@ public class Paddle extends GameObject {
     private final UserInputListener inputListener;
     private final float leftEdge;
     private final float rightEdge;
+    private int collisionCounter;
 
     /**
      * Construct a new GameObject instance.
@@ -31,18 +33,20 @@ public class Paddle extends GameObject {
         this.inputListener = inputListener;
         this.leftEdge = leftBorder;
         this.rightEdge = rightBorder;
+        collisionCounter = 0;
+
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
         Vector2 movementDir = Vector2.ZERO;
-        if(inputListener.isKeyPressed(KeyEvent.VK_LEFT) &&
-        getTopLeftCorner().x() > leftEdge){
+        if (inputListener.isKeyPressed(KeyEvent.VK_LEFT) &&
+                getTopLeftCorner().x() > leftEdge) {
             movementDir = movementDir.add(Vector2.LEFT);
         }
-        if(inputListener.isKeyPressed(KeyEvent.VK_RIGHT) &&
-        getTopLeftCorner().x() + getDimensions().x() < rightEdge){
+        if (inputListener.isKeyPressed(KeyEvent.VK_RIGHT) &&
+                getTopLeftCorner().x() + getDimensions().x() < rightEdge) {
             movementDir = movementDir.add(Vector2.RIGHT);
         }
         setVelocity(movementDir.mult(MOVEMENT_SPEED));
@@ -51,5 +55,14 @@ public class Paddle extends GameObject {
     @Override
     public Vector2 getTopLeftCorner() {
         return super.getTopLeftCorner();
+    }
+
+    @Override
+    public void onCollisionEnter(GameObject other, Collision collision) {
+        collisionCounter++;
+    }
+
+    public int getCollisionCounter() {
+        return collisionCounter;
     }
 }

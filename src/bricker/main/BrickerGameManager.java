@@ -16,6 +16,7 @@ import danogl.util.Counter;
 import danogl.util.Vector2;
 import bricker.gameobjects.Ball;
 import bricker.game_parameters.BallParameters;
+import bricker.game_parameters.gameRules;
 
 
 import java.awt.event.KeyEvent;
@@ -67,6 +68,9 @@ public class BrickerGameManager extends GameManager {
     private Ball mainBall;
     private HeartBar heartBar;
     private Counter brickCounter;
+    private Ball[] otherBalls;
+    private Paddle mainPaddle;
+    private Paddle extraPaddle;
 
     private Vector2 windowDimensions;
     private ImageReader imageReader;
@@ -76,7 +80,6 @@ public class BrickerGameManager extends GameManager {
 
     private final Random rand;
 
-    private Ball[] otherBalls;
 
     public static void main(String[] args) {
         int bricksInRow = BRICKS_IN_ROW;
@@ -107,6 +110,7 @@ public class BrickerGameManager extends GameManager {
         if (checkWCondition()) return;
         checkBallOutOfBounds();
         checkOtherBallsOutOfBounds();
+        checkExtraPaddleExpiration();
         checkGameEndConditions();
     }
 
@@ -120,7 +124,8 @@ public class BrickerGameManager extends GameManager {
         this.windowDimensions = windowController.getWindowDimensions();
 
         createBall(imageReader, soundReader);
-        createPaddle(imageReader, inputListener);
+        createPaddle(imageReader, inputListener, false);
+        extraPaddle = null;
         createWalls();
         createBackground(imageReader);
         createBrickGrid(imageReader);
@@ -152,6 +157,10 @@ public class BrickerGameManager extends GameManager {
         if (obj instanceof Ball) {
             addOtherBall((Ball) obj);
         }
+    }
+
+    public void createAdditionalPaddle() {
+        createPaddle(imageReader, inputListener, true);
     }
 
     private void addOtherBall(Ball ball) {
@@ -215,6 +224,19 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    private void checkExtraPaddleExpiration() {
+        if (extraPaddle == null) {
+            return;
+        }
+
+        if (extraPaddle.getCollisionCounter() >= gameRules.MAX_EXTRA_PADDLE_HITS) {
+            gameObjects().removeGameObject(extraPaddle);
+            extraPaddle = null;
+        }
+
+
+    }
+
     private void checkGameEndConditions() {
         if (heartBar.getCurrentHearts() <= 0) {
             handleEndGame(MESSAGE_LOSE);
@@ -273,15 +295,35 @@ public class BrickerGameManager extends GameManager {
         brickCounter.increment();
     }
 
-    private void createPaddle(ImageReader imageReader, UserInputListener inputListener) {
+    private Paddle createPaddleAtHeight(ImageReader imageReader, UserInputListener inputListener, float yCoordinate) {
         float leftBorder = WALL_WIDTH;
         float rightBorder = windowDimensions.x() - WALL_WIDTH;
         Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
         Paddle paddle = new Paddle(Vector2.ZERO, PADDLE_SIZE, paddleImage, inputListener,
                 leftBorder, rightBorder);
         paddle.setCenter(new Vector2(windowDimensions.x() / 2,
-                windowDimensions.y() - PADDLE_Y_OFFSET));
+                yCoordinate - PADDLE_Y_OFFSET));
         gameObjects().addGameObject(paddle);
+        return paddle;
+    }
+
+    private void createPaddle(ImageReader imageReader, UserInputListener inputListener, boolean isAdditional) {
+        // extra already exists
+        if (isAdditional && extraPaddle != null) {
+            return;
+        }
+
+        float yCoordinate = windowDimensions.y();
+        if (isAdditional) {
+            yCoordinate /= 2;
+        }
+        Paddle paddle = createPaddleAtHeight(imageReader, inputListener, yCoordinate);
+        if (isAdditional) {
+            extraPaddle = paddle;
+        } else {
+            mainPaddle = paddle;
+        }
+
     }
 
     private void createBall(ImageReader imageReader, SoundReader soundReader) {
