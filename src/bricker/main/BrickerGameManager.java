@@ -3,8 +3,7 @@ package bricker.main;
 import bricker.brick_startegies.BasicCollisionStrategy;
 import bricker.brick_startegies.CollisionStrategy;
 import bricker.brick_startegies.CollisionStrategyFactory;
-import bricker.game_parameters.HeartParameters;
-import bricker.game_parameters.TurboParams;
+import bricker.game_parameters.*;
 import bricker.game_objects.Brick;
 import bricker.game_objects.HeartBar;
 import bricker.game_objects.Paddle;
@@ -17,9 +16,6 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Counter;
 import danogl.util.Vector2;
 import bricker.game_objects.Ball;
-import bricker.game_parameters.BallParameters;
-import bricker.game_parameters.GameRules;
-
 
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -30,33 +26,7 @@ public class BrickerGameManager extends GameManager {
     // Game Settings
     private static final String GAME_TITLE = "Bricker";
     private static final Vector2 WINDOW_SIZE = new Vector2(700, 500);
-
-    // Bricks
-    private static final int BRICKS_IN_ROW = 8;
-    //    private static final int ROWS = 7;
-    private static final int ROWS = 2;
-    private static final int BRICK_HEIGHT = 15;
-    private static final int BRICK_X_GAP = 2;
-    private static final int BRICK_Y_GAP = 2;
-
-    // Paddle
-    private static final Vector2 PADDLE_SIZE = new Vector2(200, 20);
-    private static final int PADDLE_Y_OFFSET = 30;
-
-
-    // Walls
-    private static final int WALL_WIDTH = 10;
-    private static final int WALL_HEIGHT = 10;
-
-    // Hearts
-    private static final int INITIAL_HEARTS = 3;
-    private static final int MAX_HEARTS = 4;
-    private static final Vector2 HEART_BAR_POSITION_OFFSET = new Vector2(WALL_WIDTH, 0);
-
-    // Assets
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
-    private static final String BRICK_IMAGE_PATH = "assets/brick.png";
-    private static final String PADDLE_IMAGE_PATH = "assets/paddle.png";
 
     private Renderable turboImage;
     private Renderable ballImage;
@@ -92,8 +62,8 @@ public class BrickerGameManager extends GameManager {
 
 
     public static void main(String[] args) {
-        int bricksInRow = BRICKS_IN_ROW;
-        int rows = ROWS;
+        int bricksInRow = GameRules.BRICKS_IN_ROW;
+        int rows = GameRules.ROWS;
         if (args.length == 2) {
             bricksInRow = Integer.parseInt(args[0]);
             rows = Integer.parseInt(args[1]);
@@ -137,9 +107,9 @@ public class BrickerGameManager extends GameManager {
 
         // loading assets
         ballImage = imageReader.readImage(BallParameters.BALL_IMAGE_PATH, true);
-        turboImage = imageReader.readImage(TurboParams.TURBO_IMAGE_PATH, true);
+        turboImage = imageReader.readImage(TurboParameters.TURBO_IMAGE_PATH, true);
         collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
-        paddleImage = imageReader.readImage(PADDLE_IMAGE_PATH, true);
+        paddleImage = imageReader.readImage(PaddleParameters.PADDLE_IMAGE_PATH, true);
 
         createBall();
         createPaddle(inputListener, false);
@@ -164,12 +134,12 @@ public class BrickerGameManager extends GameManager {
     /**
      * adds a GameObject to the gameObjects of the game.
      *
-     * @param obj object to be added.
+     * @param obj              object to be added.
      * @param checkOutOfBounds - if true, remove object when it's out of screen.
      */
     public void addGameObject(GameObject obj, boolean checkOutOfBounds) {
         gameObjects().addGameObject(obj);
-        if(checkOutOfBounds) {
+        if (checkOutOfBounds) {
             movingObjects.add(obj);
         }
     }
@@ -184,7 +154,7 @@ public class BrickerGameManager extends GameManager {
         }
         isInTurbo = true;
         mainBall.renderer().setRenderable(turboImage);
-        mainBall.setVelocity(mainBall.getVelocity().mult(TurboParams.TURBO_FACTOR));
+        mainBall.setVelocity(mainBall.getVelocity().mult(TurboParameters.TURBO_FACTOR));
 
         counterWhenturboStarted = mainBall.getCollisionCounter();
     }
@@ -269,7 +239,7 @@ public class BrickerGameManager extends GameManager {
         if (!isInTurbo) {
             return;
         }
-        if (mainBall.getCollisionCounter() >= TurboParams.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
+        if (mainBall.getCollisionCounter() >= GameRules.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
             exitTurboMode();
         }
     }
@@ -294,24 +264,24 @@ public class BrickerGameManager extends GameManager {
     private void createHeartBar(ImageReader imageReader) {
         Renderable heartImage = imageReader.readImage(HeartParameters.HEART_IMAGE_PATH, true);
         Vector2 heartBarPosition = new Vector2(
-                HEART_BAR_POSITION_OFFSET.x(),
+                HeartParameters.HEART_BAR_POSITION_OFFSET.x(),
                 windowDimensions.y() - HeartParameters.HEART_SIZE.y()
         );
-        heartBar = new HeartBar(heartBarPosition, HeartParameters.HEART_SIZE, heartImage, MAX_HEARTS,
-                INITIAL_HEARTS, gameObjects());
+        heartBar = new HeartBar(heartBarPosition, HeartParameters.HEART_SIZE, heartImage, GameRules.MAX_HEARTS,
+                GameRules.INITIAL_HEARTS, gameObjects());
     }
 
     private void createBrickGrid(ImageReader imageReader) {
-        float availableWidth = windowDimensions.x() - 2 * WALL_WIDTH;
-        float totalGapWidth = (bricksInRow + 1) * BRICK_X_GAP;
+        float availableWidth = windowDimensions.x() - 2 * WallParameters.WALL_WIDTH;
+        float totalGapWidth = (bricksInRow + 1) * BrickParameters.BRICK_X_GAP;
         float brickWidth = (availableWidth - totalGapWidth) / bricksInRow;
-        Vector2 brickSize = new Vector2(brickWidth, BRICK_HEIGHT);
+        Vector2 brickSize = new Vector2(brickWidth, BrickParameters.BRICK_HEIGHT);
         brickCounter = new Counter(0);
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < bricksInRow; col++) {
-                float x = WALL_WIDTH + BRICK_X_GAP + col * (brickWidth + BRICK_X_GAP);
-                float y = WALL_HEIGHT + BRICK_Y_GAP + row * (BRICK_HEIGHT + BRICK_Y_GAP);
+                float x = WallParameters.WALL_WIDTH + BrickParameters.BRICK_X_GAP + col * (brickWidth + BrickParameters.BRICK_X_GAP);
+                float y = WallParameters.WALL_HEIGHT + BrickParameters.BRICK_Y_GAP + row * (BrickParameters.BRICK_HEIGHT + BrickParameters.BRICK_Y_GAP);
                 CollisionStrategy strategy = getRandomStrategy();
                 createBrick(imageReader, new Vector2(x, y), brickSize,
                         strategy);
@@ -326,19 +296,19 @@ public class BrickerGameManager extends GameManager {
 
     private void createBrick(ImageReader imageReader, Vector2 topLeftPosition, Vector2 dimensions,
                              CollisionStrategy collisionStrategy) {
-        Renderable brickImage = imageReader.readImage(BRICK_IMAGE_PATH, false);
+        Renderable brickImage = imageReader.readImage(BrickParameters.BRICK_IMAGE_PATH, false);
         Brick brick = new Brick(topLeftPosition, dimensions, brickImage, collisionStrategy);
         gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
         brickCounter.increment();
     }
 
     private Paddle createPaddleAtHeight(UserInputListener inputListener, float yCoordinate) {
-        float leftBorder = WALL_WIDTH;
-        float rightBorder = windowDimensions.x() - WALL_WIDTH;
-        Paddle paddle = new Paddle(Vector2.ZERO, PADDLE_SIZE, paddleImage, inputListener,
+        float leftBorder = WallParameters.WALL_WIDTH;
+        float rightBorder = windowDimensions.x() - WallParameters.WALL_WIDTH;
+        Paddle paddle = new Paddle(Vector2.ZERO, PaddleParameters.PADDLE_SIZE, paddleImage, inputListener,
                 leftBorder, rightBorder);
         paddle.setCenter(new Vector2(windowDimensions.x() / 2,
-                yCoordinate - PADDLE_Y_OFFSET));
+                yCoordinate - PaddleParameters.PADDLE_Y_OFFSET));
         gameObjects().addGameObject(paddle);
         return paddle;
     }
@@ -380,19 +350,19 @@ public class BrickerGameManager extends GameManager {
     private void createWalls() {
         Vector2[][] wallLocations = new Vector2[3][2];
 
-        Vector2 yVec = new Vector2(WALL_WIDTH, windowDimensions.y());
+        Vector2 yVec = new Vector2(WallParameters.WALL_WIDTH, windowDimensions.y());
 
         // left
         wallLocations[0][0] = Vector2.ZERO;
         wallLocations[0][1] = yVec;
 
         //right
-        wallLocations[1][0] = new Vector2(windowDimensions.x() - WALL_WIDTH, 0);
+        wallLocations[1][0] = new Vector2(windowDimensions.x() - WallParameters.WALL_WIDTH, 0);
         wallLocations[1][1] = yVec;
 
         //top
         wallLocations[2][0] = Vector2.ZERO;
-        wallLocations[2][1] = new Vector2(windowDimensions.x(), WALL_HEIGHT);
+        wallLocations[2][1] = new Vector2(windowDimensions.x(), WallParameters.WALL_HEIGHT);
 
         for (Vector2[] wallLocation : wallLocations) {
             GameObject wall = new GameObject(wallLocation[0], wallLocation[1], null);
@@ -413,6 +383,6 @@ public class BrickerGameManager extends GameManager {
         }
         isInTurbo = false;
         mainBall.renderer().setRenderable(ballImage);
-        mainBall.setVelocity(mainBall.getVelocity().mult(1.0f / TurboParams.TURBO_FACTOR));
+        mainBall.setVelocity(mainBall.getVelocity().mult(1.0f / TurboParameters.TURBO_FACTOR));
     }
 }
