@@ -9,7 +9,6 @@ import danogl.util.Vector2;
 
 public class Brick extends GameObject {
     private final CollisionStrategy collisionStrategy;
-    private final Counter brickCounter;
 
     /**
      * Construct a new GameObject instance.
@@ -20,20 +19,16 @@ public class Brick extends GameObject {
      * @param renderable        The renderable representing the object. Can be null, in which case
      *                          the GameObject will not be rendered.
      * @param collisionStrategy
-     * @param brickCounter
      */
     public Brick(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable,
-                 CollisionStrategy collisionStrategy, Counter brickCounter) {
+                 CollisionStrategy collisionStrategy) {
         super(topLeftCorner, dimensions, renderable);
         this.collisionStrategy = collisionStrategy;
-        this.brickCounter = brickCounter;
-        brickCounter.increment();
     }
 
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
         this.collisionStrategy.onCollision(this, other);
-        brickCounter.decrement();
     }
 }

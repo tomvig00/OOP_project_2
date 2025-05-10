@@ -166,22 +166,22 @@ public class BrickerGameManager extends GameManager {
         float totalGapWidth = (bricksInRow + 1) * BRICK_X_GAP;
         float brickWidth = (availableWidth - totalGapWidth) / bricksInRow;
         Vector2 brickSize = new Vector2(brickWidth, BRICK_HEIGHT);
-        brickCounter = new Counter();
+        brickCounter = new Counter(bricksInRow * rows);
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < bricksInRow; col++) {
                 float x = WALL_WIDTH + BRICK_X_GAP + col * (brickWidth + BRICK_X_GAP);
                 float y = WALL_HEIGHT + BRICK_Y_GAP + row * (BRICK_HEIGHT + BRICK_Y_GAP);
                 createBrick(imageReader, new Vector2(x, y), brickSize,
-                        new BasicCollisionStrategy(gameObjects()), brickCounter);
+                        new BasicCollisionStrategy(gameObjects(), brickCounter));
             }
         }
     }
 
     private void createBrick(ImageReader imageReader, Vector2 topLeftPosition, Vector2 dimensions,
-                             CollisionStrategy collisionStrategy, Counter brickCounter) {
+                             CollisionStrategy collisionStrategy) {
         Renderable brickImage = imageReader.readImage(BRICK_IMAGE_PATH, false);
-        Brick brick = new Brick(topLeftPosition, dimensions, brickImage, collisionStrategy, brickCounter);
+        Brick brick = new Brick(topLeftPosition, dimensions, brickImage, collisionStrategy);
         gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
     }
 
