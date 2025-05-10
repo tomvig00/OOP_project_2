@@ -56,7 +56,7 @@ public class AddPuckStrategy implements CollisionStrategyDecorator{
     private void setRandomBallSpeed(Ball ball ) {
         double angle = rand.nextDouble() * Math.PI;
         float velocityX = (float) Math.cos(angle) * BallParameters.BALL_SPEED;
-        float velocityY = (float) Math.cos(angle) * BallParameters.BALL_SPEED;
+        float velocityY = (float) Math.sin(angle) * BallParameters.BALL_SPEED;
         ball.setVelocity(new Vector2(velocityX, velocityY));
     }
 }

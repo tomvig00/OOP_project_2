@@ -233,8 +233,6 @@ public class BrickerGameManager extends GameManager {
             gameObjects().removeGameObject(extraPaddle);
             extraPaddle = null;
         }
-
-
     }
 
     private void checkGameEndConditions() {
