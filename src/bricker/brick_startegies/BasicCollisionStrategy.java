@@ -1,9 +1,7 @@
 package bricker.brick_startegies;
 
 import bricker.main.BrickerGameManager;
-import danogl.GameManager;
 import danogl.GameObject;
-import danogl.collisions.GameObjectCollection;
 import danogl.collisions.Layer;
 import danogl.util.Counter;
 
@@ -26,6 +24,11 @@ public class BasicCollisionStrategy implements CollisionStrategy {
         this.brickCounter = brickCounter;
     }
 
+    /**
+     * overrides onCollision.
+     * @param obj1 the first object in the collision
+     * @param obj2 the second object in the collision
+     */
     @Override
     public void onCollision(GameObject obj1, GameObject obj2) {
         boolean foundBrick = gameManager.removeGameObject(obj1, Layer.STATIC_OBJECTS);

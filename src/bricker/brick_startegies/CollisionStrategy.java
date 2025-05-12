@@ -2,6 +2,10 @@ package bricker.brick_startegies;
 
 import danogl.GameObject;
 
+/**
+ * Interface of a brick collision strategy
+ * @author tal.ronen1, tomvig00
+ */
 public interface CollisionStrategy {
     /**
      * This method is called when a collision occurs.

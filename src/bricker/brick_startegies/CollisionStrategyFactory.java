@@ -2,11 +2,25 @@ package bricker.brick_startegies;
 
 import bricker.main.BrickerGameManager;
 
-import java.util.Random;
+/**
+ * A factory for brick strategies.
+ *
+ * @author tal.ronen1, tomvig00
+ */
 
 public class CollisionStrategyFactory {
 
-    public static CollisionStrategy getCollisionStrategyDecorator(CollisionStrategyEnum strategyEnum, CollisionStrategy baseStrategy, BrickerGameManager manager) {
+    /**
+     * wraps a given strategy with a new behavior.
+     *
+     * @param strategyEnum - the enum of the behavior to add
+     * @param baseStrategy - strategy to wrap
+     * @param manager      - current game manager
+     * @return - collision strategy representing the wrapped strategy
+     */
+    public static CollisionStrategy getCollisionStrategyDecorator(CollisionStrategyEnum strategyEnum,
+                                                                  CollisionStrategy baseStrategy,
+                                                                  BrickerGameManager manager) {
         assert strategyEnum != CollisionStrategyEnum.DOUBLE_STRATEGY;
         switch (strategyEnum) {
             case ADD_PUCK:

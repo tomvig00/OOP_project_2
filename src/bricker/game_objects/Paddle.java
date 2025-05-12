@@ -9,6 +9,10 @@ import danogl.util.Vector2;
 
 import java.awt.event.KeyEvent;
 
+/**
+ * game object of a paddle.
+ * @author tal.ronen1, tomvig00
+ */
 public class Paddle extends GameObject {
 
     private static final float MOVEMENT_SPEED = 300;
@@ -25,11 +29,12 @@ public class Paddle extends GameObject {
      * @param dimensions    Width and height in window coordinates.
      * @param renderable    The renderable representing the object. Can be null, in which case
      *                      the GameObject will not be rendered.
-     * @param inputListener
-     * @param leftBorder
-     * @param rightBorder
+     * @param inputListener - input listener to draw movement from.
+     * @param leftBorder - left border of the paddle
+     * @param rightBorder - right border of the paddle
      */
-    public Paddle(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, UserInputListener inputListener, float leftBorder, float rightBorder) {
+    public Paddle(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable, UserInputListener
+            inputListener, float leftBorder, float rightBorder) {
         super(topLeftCorner, dimensions, renderable);
         this.inputListener = inputListener;
         this.leftEdge = leftBorder;
@@ -38,6 +43,15 @@ public class Paddle extends GameObject {
 
     }
 
+    /**
+     * update Override
+     * @param deltaTime The time elapsed, in seconds, since the last frame. Can
+     *                  be used to determine a new position/velocity by multiplying
+     *                  this delta with the velocity/acceleration respectively
+     *                  and adding to the position/velocity:
+     *                  velocity += deltaTime*acceleration
+     *                  pos += deltaTime*velocity
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
@@ -53,11 +67,22 @@ public class Paddle extends GameObject {
         setVelocity(movementDir.mult(MOVEMENT_SPEED));
     }
 
+    /**
+     * topLeftCorner getter
+     * @return topLeftCorner of paddle
+     */
     @Override
     public Vector2 getTopLeftCorner() {
         return super.getTopLeftCorner();
     }
 
+    /**
+     * onCollisionEnter Override
+     * @param other The GameObject with which a collision occurred.
+     * @param collision Information regarding this collision.
+     *                  A reasonable elastic behavior can be achieved with:
+     *                  setVelocity(getVelocity().flipped(collision.getNormal()));
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         if (other.getTag().equals(BallParameters.BALL_TAG)) {
@@ -65,6 +90,10 @@ public class Paddle extends GameObject {
         }
     }
 
+    /**
+     * collisionCounter getter
+     * @return collisionCounter
+     */
     public int getCollisionCounter() {
         return collisionCounter;
     }

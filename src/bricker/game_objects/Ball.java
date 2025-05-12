@@ -6,6 +6,11 @@ import danogl.gui.Sound;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * game object of a moving ball.
+ * @author tal.ronen1, tomvig00
+ */
+
 public class Ball extends GameObject {
     private int collisionCounter;
     private final Sound collisionSound;
@@ -26,6 +31,13 @@ public class Ball extends GameObject {
         this.collisionSound = collisionSound;
     }
 
+    /**
+     * onCollisionEnter override
+     * @param other The GameObject with which a collision occurred.
+     * @param collision Information regarding this collision.
+     *                  A reasonable elastic behavior can be achieved with:
+     *                  setVelocity(getVelocity().flipped(collision.getNormal()));
+     */
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
         super.onCollisionEnter(other, collision);
@@ -35,6 +47,10 @@ public class Ball extends GameObject {
         collisionSound.play();
     }
 
+    /**
+     * returns the amount of collisions a ball had.
+     * @return collision amount
+     */
     public int getCollisionCounter() {
         return collisionCounter;
     }

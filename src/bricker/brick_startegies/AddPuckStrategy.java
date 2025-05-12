@@ -10,6 +10,11 @@ import danogl.util.Vector2;
 
 import java.util.Random;
 
+
+/**
+ * collision strategy of dropping two pucks.
+ * @author tal.ronen1, tomvig00
+ */
 public class AddPuckStrategy extends CollisionStrategyDecorator {
     private static final int BALL_AMOUNT = 2;
     private static final float SIZE_FACTOR = 0.75f;
@@ -21,7 +26,11 @@ public class AddPuckStrategy extends CollisionStrategyDecorator {
 
     private static Random rand;
 
-
+    /**
+     * constructor
+     * @param baseStrategy - base strategy to wrap with this decorator
+     * @param manager - game manager of current game.
+     */
     public AddPuckStrategy(CollisionStrategy baseStrategy, BrickerGameManager manager) {
         super(baseStrategy, manager);
         rand = new Random();
@@ -35,17 +44,23 @@ public class AddPuckStrategy extends CollisionStrategyDecorator {
         }
     }
 
+    /**
+     * strategyOnCollision override.
+     * @param obj1 - first object in the collision.
+     * @param obj2 - the second object in the collision.
+     */
     @Override
     public void strategyOnCollision(GameObject obj1, GameObject obj2) {
         addMoreBalls(obj1.getCenter());
     }
 
+    // add two balls to the game
     private void addMoreBalls(Vector2 spawnAt) {
         for (int i = 0; i < BALL_AMOUNT; i++) {
             addPuckBall(spawnAt);
         }
     }
-
+    // add a ball to the game
     private void addPuckBall(Vector2 spawnAt) {
         Ball ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE.mult(SIZE_FACTOR), ballImage, ballSound);
         setRandomBallSpeed(ball);
@@ -54,6 +69,7 @@ public class AddPuckStrategy extends CollisionStrategyDecorator {
         manager.addGameObject(ball, true);
     }
 
+    // set the ball speed randomly.
     private void setRandomBallSpeed(Ball ball) {
         double angle = rand.nextDouble() * Math.PI;
         float velocityX = (float) Math.cos(angle) * BallParameters.BALL_SPEED;

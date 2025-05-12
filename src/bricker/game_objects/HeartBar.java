@@ -37,6 +37,16 @@ public class HeartBar extends GameObject {
     private final GameObject numberDisplay;
     private final TextRenderable numberText;
 
+    /**
+     * constructor
+     *
+     * @param topLeftCorner - top left corner.
+     * @param heartSize     - size of heart.
+     * @param heartImage    - image of heart
+     * @param maxHearts     - max heart amount possible.
+     * @param initialHearts - initial amount of hearts
+     * @param gameObjects   - game objects of the current game.
+     */
     public HeartBar(Vector2 topLeftCorner,
                     Vector2 heartSize,
                     Renderable heartImage,
@@ -65,6 +75,9 @@ public class HeartBar extends GameObject {
         updateNumberText();
     }
 
+    /**
+     * adds a heart if possible
+     */
     public void addHeart() {
         if (hearts.size() < maxHearts) {
             Vector2 position = getTopLeftCorner().add(new Vector2(
@@ -76,6 +89,9 @@ public class HeartBar extends GameObject {
         }
     }
 
+    /**
+     * removes a heart
+     */
     public void removeHeart() {
         if (!hearts.isEmpty()) {
             GameObject heart = hearts.remove(hearts.size() - 1);
@@ -84,10 +100,16 @@ public class HeartBar extends GameObject {
         }
     }
 
+    /**
+     * get current heart amount
+     *
+     * @return current heart amount.
+     */
     public int getCurrentHearts() {
         return hearts.size();
     }
 
+    // calculate the dimensions of the heart bar
     private static Vector2 calculateBarDimensions(Vector2 heartSize, int maxHearts) {
         int totalSlots = maxHearts + 1; // +1 for the number
         float width = totalSlots * heartSize.x() + (totalSlots - 1) * HEART_SPACING;
@@ -95,6 +117,7 @@ public class HeartBar extends GameObject {
         return new Vector2(width, height);
     }
 
+    // updates the text on screen
     private void updateNumberText() {
         int current = getCurrentHearts();
         numberText.setString(String.valueOf(current));

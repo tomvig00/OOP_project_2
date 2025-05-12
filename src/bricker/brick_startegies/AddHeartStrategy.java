@@ -7,10 +7,19 @@ import danogl.GameObject;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * collision strategy of dropping a heart.
+ * @author tal.ronen1, tomvig00
+ */
 public class AddHeartStrategy extends CollisionStrategyDecorator{
 
     private static Renderable heartImage = null;
 
+    /**
+     * constructor
+     * @param baseStrategy - base strategy to wrap with this decorator
+     * @param manager - game manager of current game.
+     */
     public AddHeartStrategy (CollisionStrategy baseStrategy, BrickerGameManager manager) {
         super(baseStrategy, manager);
 
@@ -20,6 +29,11 @@ public class AddHeartStrategy extends CollisionStrategyDecorator{
 
     }
 
+    /**
+     * strategyOnCollision override.
+     * @param obj1 - first object in the collision.
+     * @param obj2 - the second object in the collision.
+     */
     @Override
     public void strategyOnCollision(GameObject obj1, GameObject obj2) {
         Vector2 position = obj1.getCenter();
