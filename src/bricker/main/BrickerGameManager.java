@@ -22,6 +22,11 @@ import java.awt.event.KeyEvent;
 import java.util.Random;
 import java.util.Vector;
 
+/**
+ * game manager class
+ *
+ * @author tal.ronen1, tomvig00
+ */
 public class BrickerGameManager extends GameManager {
 
     // Game Settings
@@ -62,6 +67,11 @@ public class BrickerGameManager extends GameManager {
     private final Random rand;
 
 
+    /**
+     * runs the game
+     *
+     * @param args - cmd args (bricks in row and row amount)
+     */
     public static void main(String[] args) {
         int bricksInRow = GameRules.BRICKS_IN_ROW;
         int rows = GameRules.ROWS;
@@ -74,6 +84,14 @@ public class BrickerGameManager extends GameManager {
         gameManager.run();
     }
 
+    /**
+     * constructor
+     *
+     * @param windowTitle      - window title
+     * @param windowDimensions - dimensions
+     * @param bricksInRow      - amount of bricks in row
+     * @param rows             - amount of rows
+     */
     public BrickerGameManager(String windowTitle, Vector2 windowDimensions, int bricksInRow, int rows) {
         super(windowTitle, windowDimensions);
         this.bricksInRow = bricksInRow;
@@ -81,10 +99,19 @@ public class BrickerGameManager extends GameManager {
 
         rand = new Random();
 
-//        otherBalls = new Ball[100];
         movingObjects = new Vector<>();
     }
 
+    /**
+     * update Override
+     *
+     * @param deltaTime The time, in seconds, that passed since the last invocation
+     *                  of this method (i.e., since the last frame). This is useful
+     *                  for either accumulating the total time that passed since some
+     *                  event, or for physics integration (i.e., multiply this by
+     *                  the acceleration to get an estimate of the added velocity or
+     *                  by the velocity to get an estimate of the difference in position).
+     */
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
@@ -97,6 +124,19 @@ public class BrickerGameManager extends GameManager {
         checkGameEndConditions();
     }
 
+    /**
+     * initialize game override.
+     *
+     * @param imageReader      Contains a single method: readImage, which reads an image from disk.
+     *                         See its documentation for help.
+     * @param soundReader      Contains a single method: readSound, which reads a wav file from
+     *                         disk. See its documentation for help.
+     * @param inputListener    Contains a single method: isKeyPressed, which returns whether
+     *                         a given key is currently pressed by the user or not. See its
+     *                         documentation.
+     * @param windowController Contains an array of helpful, self explanatory methods
+     *                         concerning the window.
+     */
     @Override
     public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener, WindowController windowController) {
         this.inputListener = inputListener;
@@ -145,10 +185,16 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    /**
+     * creates an additional paddle if possible.
+     */
     public void createAdditionalPaddle() {
         createPaddle(inputListener, true);
     }
 
+    /**
+     * enter turbo mode if not in turbo
+     */
     public void enterTurboMode() {
         if (isInTurbo) {
             return;
@@ -178,19 +224,34 @@ public class BrickerGameManager extends GameManager {
         return soundReader;
     }
 
+    /**
+     * checks if an object is the main ball
+     *
+     * @param obj - gameObject to test
+     * @return - true if main ball.
+     */
     public boolean isMainBall(GameObject obj) {
         return obj == mainBall;
     }
 
+    /**
+     * checks if an object is the main paddle
+     *
+     * @param obj - gameObject to test
+     * @return - true if main paddle.
+     */
     public boolean isMainPaddle(GameObject obj) {
         return obj == mainPaddle;
     }
 
+    /**
+     * adds a life
+     */
     public void addLife() {
         heartBar.addHeart();
     }
 
-
+    // checks if win condition was reached
     private boolean checkWCondition() {
         if (inputListener.isKeyPressed(KeyEvent.VK_W)) {
             handleEndGame(MESSAGE_WIN);
@@ -199,10 +260,12 @@ public class BrickerGameManager extends GameManager {
         return false;
     }
 
+    // checks if an object is outside the screen
     private boolean isOutOfBounds(GameObject obj) {
         return obj.getTopLeftCorner().y() > windowDimensions.y();
     }
 
+    // checks if the main ball is out of bounds and handles it if it is
     private void checkBallOutOfBounds() {
         if (isOutOfBounds(mainBall)) {
             heartBar.removeHeart();
@@ -211,6 +274,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // removes elements in movingObjects that are out of bounds
     private void checkMovingObjectsOutOfBounds() {
         Vector<GameObject> toBeRemoved = new Vector<>();
         for (GameObject obj : movingObjects) {
@@ -225,6 +289,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // removes extra paddle if expired.
     private void checkExtraPaddleExpiration() {
         if (extraPaddle == null) {
             return;
@@ -236,6 +301,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // exists turbo mode if expires.
     private void checkTurboExpiration() {
         if (!isInTurbo) {
             return;
@@ -245,6 +311,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // checks if the game ended and handles it if it has.
     private void checkGameEndConditions() {
         if (heartBar.getCurrentHearts() <= 0) {
             handleEndGame(MESSAGE_LOSE);
@@ -253,6 +320,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // handles the game ending prompt
     private void handleEndGame(String message) {
         message += MESSAGE_END_PROMPT;
         if (windowController.openYesNoDialog(message)) {
@@ -262,6 +330,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // creates a heart bar
     private void createHeartBar(ImageReader imageReader) {
         Renderable heartImage = imageReader.readImage(HeartParameters.HEART_IMAGE_PATH, true);
         Vector2 heartBarPosition = new Vector2(
@@ -272,6 +341,7 @@ public class BrickerGameManager extends GameManager {
                 GameRules.INITIAL_HEARTS, gameObjects());
     }
 
+    // creates the brick grid
     private void createBrickGrid(ImageReader imageReader) {
         float availableWidth = windowDimensions.x() - 2 * WallParameters.WALL_WIDTH;
         float totalGapWidth = (bricksInRow + 1) * BrickParameters.BRICK_X_GAP;
@@ -290,11 +360,13 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // generates a random brick collision strategy.
     private CollisionStrategy getRandomStrategy() {
         CollisionStrategy baseStrategy = new BasicCollisionStrategy(this, brickCounter);
         return expandStrategyRandomly(baseStrategy);
     }
 
+    // generates a brick object
     private void createBrick(ImageReader imageReader, Vector2 topLeftPosition, Vector2 dimensions,
                              CollisionStrategy collisionStrategy) {
         Renderable brickImage = imageReader.readImage(BrickParameters.BRICK_IMAGE_PATH, false);
@@ -303,6 +375,7 @@ public class BrickerGameManager extends GameManager {
         brickCounter.increment();
     }
 
+    // generates a paddle at a given height
     private Paddle createPaddleAtHeight(UserInputListener inputListener, float yCoordinate) {
         float leftBorder = WallParameters.WALL_WIDTH;
         float rightBorder = windowDimensions.x() - WallParameters.WALL_WIDTH;
@@ -314,6 +387,7 @@ public class BrickerGameManager extends GameManager {
         return paddle;
     }
 
+    // creates a paddle
     private void createPaddle(UserInputListener inputListener, boolean isAdditional) {
         // extra already exists
         if (isAdditional && extraPaddle != null) {
@@ -333,6 +407,7 @@ public class BrickerGameManager extends GameManager {
 
     }
 
+    // creates the main ball
     private void createMainBall() {
         mainBall = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
         setRandomBallSpeed(mainBall);
@@ -340,6 +415,7 @@ public class BrickerGameManager extends GameManager {
         mainBall.setTag(BallParameters.BALL_TAG);
     }
 
+    // sets a ball to a random speed
     private void setRandomBallSpeed(Ball ball) {
         float ballVelX = BallParameters.BALL_SPEED;
         float ballVelY = BallParameters.BALL_SPEED;
@@ -349,6 +425,7 @@ public class BrickerGameManager extends GameManager {
         ball.setCenter(windowDimensions.mult(0.5f));
     }
 
+    // creates the outer walls
     private void createWalls() {
         Vector2[][] wallLocations = new Vector2[3][2];
 
@@ -372,6 +449,7 @@ public class BrickerGameManager extends GameManager {
         }
     }
 
+    // creates the background
     private void createBackground(ImageReader imageReader) {
         Renderable backgroundImage = imageReader.readImage(BACKGROUND_IMAGE_PATH, false);
         GameObject background = new GameObject(Vector2.ZERO, windowDimensions, backgroundImage);
@@ -379,6 +457,7 @@ public class BrickerGameManager extends GameManager {
         gameObjects().addGameObject(background, Layer.BACKGROUND);
     }
 
+    // exists turbo mode
     private void exitTurboMode() {
         if (!isInTurbo) {
             return;
@@ -388,7 +467,7 @@ public class BrickerGameManager extends GameManager {
         mainBall.setVelocity(mainBall.getVelocity().mult(1.0f / TurboParameters.TURBO_FACTOR));
     }
 
-
+    // expands a strategy with a random strategy.
     private CollisionStrategy expandStrategyRandomly(CollisionStrategy baseStrategy) {
         if (rand.nextBoolean()) {
             return baseStrategy;
@@ -398,11 +477,13 @@ public class BrickerGameManager extends GameManager {
         int strategiesAdded = 0;
         CollisionStrategy currentStrategy = baseStrategy;
         while (strategiesAdded < strategiesToAdd && strategiesAdded <= GameRules.MAX_STRATEGY_PER_BRICK) {
-            CollisionStrategyEnum newStrategy = CollisionStrategyEnum.values()[rand.nextInt(CollisionStrategyEnum.values().length)];
+            CollisionStrategyEnum newStrategy = CollisionStrategyEnum.values()[
+                    rand.nextInt(CollisionStrategyEnum.values().length)];
             if (newStrategy == CollisionStrategyEnum.DOUBLE_STRATEGY) {
                 strategiesToAdd++;
             } else {
-                currentStrategy = CollisionStrategyFactory.getCollisionStrategyDecorator(newStrategy, currentStrategy, this);
+                currentStrategy = CollisionStrategyFactory.getCollisionStrategyDecorator(newStrategy,
+                        currentStrategy, this);
                 strategiesAdded++;
 
             }
