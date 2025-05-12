@@ -19,4 +19,7 @@ public class GameRules {
 
     // maximum heart amount possible
     public static final int MAX_HEARTS = 4;
+
+    // maximum amount of strategies per brick
+    public static final int MAX_STRATEGY_PER_BRICK = 3;
 }

@@ -5,5 +5,5 @@ public enum CollisionStrategyEnum {
     ADD_PADDLE,
     ENTER_TURBO,
     ADD_HEART,
-
+    DOUBLE_STRATEGY,
 }

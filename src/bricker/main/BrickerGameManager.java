@@ -2,6 +2,7 @@ package bricker.main;
 
 import bricker.brick_startegies.BasicCollisionStrategy;
 import bricker.brick_startegies.CollisionStrategy;
+import bricker.brick_startegies.CollisionStrategyEnum;
 import bricker.brick_startegies.CollisionStrategyFactory;
 import bricker.game_parameters.*;
 import bricker.game_objects.Brick;
@@ -291,7 +292,7 @@ public class BrickerGameManager extends GameManager {
 
     private CollisionStrategy getRandomStrategy() {
         CollisionStrategy baseStrategy = new BasicCollisionStrategy(this, brickCounter);
-        return CollisionStrategyFactory.generateRandomStrategy(baseStrategy, this);
+        return expandStrategyRandomly(baseStrategy);
     }
 
     private void createBrick(ImageReader imageReader, Vector2 topLeftPosition, Vector2 dimensions,
@@ -384,5 +385,27 @@ public class BrickerGameManager extends GameManager {
         isInTurbo = false;
         mainBall.renderer().setRenderable(ballImage);
         mainBall.setVelocity(mainBall.getVelocity().mult(1.0f / TurboParameters.TURBO_FACTOR));
+    }
+
+
+    private CollisionStrategy expandStrategyRandomly(CollisionStrategy baseStrategy) {
+        if (rand.nextBoolean()) {
+            return baseStrategy;
+        }
+
+        int strategiesToAdd = 1;
+        int strategiesAdded = 0;
+        CollisionStrategy currentStrategy = baseStrategy;
+        while (strategiesAdded < strategiesToAdd && strategiesAdded <= GameRules.MAX_STRATEGY_PER_BRICK) {
+            CollisionStrategyEnum newStrategy = CollisionStrategyEnum.values()[rand.nextInt(CollisionStrategyEnum.values().length)];
+            if (newStrategy == CollisionStrategyEnum.DOUBLE_STRATEGY) {
+                strategiesToAdd++;
+            } else {
+                currentStrategy = CollisionStrategyFactory.getCollisionStrategyDecorator(newStrategy, currentStrategy, this);
+                strategiesAdded++;
+
+            }
+        }
+        return currentStrategy;
     }
 }
