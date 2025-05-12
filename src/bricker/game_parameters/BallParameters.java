@@ -2,6 +2,10 @@ package bricker.game_parameters;
 
 import danogl.util.Vector2;
 
+/**
+ * parameters container for Ball related parameters
+ * @author tal.ronen1, tomvig00
+ */
 public class BallParameters {
 
     // path to ball sound effect

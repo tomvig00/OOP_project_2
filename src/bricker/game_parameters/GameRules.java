@@ -1,11 +1,16 @@
 package bricker.game_parameters;
 
+/**
+ * parameters container for game rules related parameters
+ *
+ * @author tal.ronen1, tomvig00
+ */
 public class GameRules {
 
     // max amount of hits an extra paddle can take
     public static final int MAX_EXTRA_PADDLE_HITS = 4;
 
-    // max amount of objects a turbo ball can colide with
+    // max amount of objects a turbo ball can collide with
     public static final int MAX_TURBO_COLLISIONS = 6;
 
     // amount of bricks in a row

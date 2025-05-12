@@ -2,6 +2,11 @@ package bricker.game_parameters;
 
 import danogl.util.Vector2;
 
+/**
+ * parameters container for heart related parameters
+ *
+ * @author tal.ronen1, tomvig00
+ */
 public class HeartParameters {
 
     // path to heart png image
