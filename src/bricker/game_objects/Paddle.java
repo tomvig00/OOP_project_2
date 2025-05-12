@@ -1,5 +1,6 @@
 package bricker.game_objects;
 
+import bricker.game_parameters.BallParameters;
 import danogl.GameObject;
 import danogl.collisions.Collision;
 import danogl.gui.UserInputListener;
@@ -59,7 +60,7 @@ public class Paddle extends GameObject {
 
     @Override
     public void onCollisionEnter(GameObject other, Collision collision) {
-        if (other instanceof Ball) {
+        if (other.getTag().equals(BallParameters.BALL_TAG)) {
             collisionCounter++;
         }
     }

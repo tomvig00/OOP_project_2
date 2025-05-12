@@ -82,7 +82,7 @@ public class BrickerGameManager extends GameManager {
         rand = new Random();
 
 //        otherBalls = new Ball[100];
-        movingObjects = new Vector<GameObject>();
+        movingObjects = new Vector<>();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class BrickerGameManager extends GameManager {
         collisionSound = soundReader.readSound(BallParameters.BALL_SOUND_PATH);
         paddleImage = imageReader.readImage(PaddleParameters.PADDLE_IMAGE_PATH, true);
 
-        createBall();
+        createMainBall();
         createPaddle(inputListener, false);
         extraPaddle = null;
         createWalls();
@@ -207,7 +207,7 @@ public class BrickerGameManager extends GameManager {
         if (isOutOfBounds(mainBall)) {
             heartBar.removeHeart();
             gameObjects().removeGameObject(mainBall);
-            createBall();
+            createMainBall();
         }
     }
 
@@ -333,10 +333,11 @@ public class BrickerGameManager extends GameManager {
 
     }
 
-    private void createBall() {
+    private void createMainBall() {
         mainBall = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE, ballImage, collisionSound);
         setRandomBallSpeed(mainBall);
         gameObjects().addGameObject(mainBall);
+        mainBall.setTag(BallParameters.BALL_TAG);
     }
 
     private void setRandomBallSpeed(Ball ball) {

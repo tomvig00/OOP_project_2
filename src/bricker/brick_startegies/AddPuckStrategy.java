@@ -11,10 +11,10 @@ import danogl.util.Vector2;
 import java.util.Random;
 
 public class AddPuckStrategy extends CollisionStrategyDecorator {
-    private final int BALL_AMOUNT = 2;
-    private final static float SIZE_FACTOR = 0.75f;
-    private final String BALL_IMAGE_PATH = "assets/mockBall.png";
-    private final String BALL_SOUND_PATH = "assets/blop.wav";
+    private static final int BALL_AMOUNT = 2;
+    private static final float SIZE_FACTOR = 0.75f;
+    private static final String BALL_IMAGE_PATH = "assets/mockBall.png";
+    private static final String BALL_SOUND_PATH = "assets/blop.wav";
 
     private static Renderable ballImage = null;
     private static Sound ballSound = null;
@@ -50,6 +50,7 @@ public class AddPuckStrategy extends CollisionStrategyDecorator {
         Ball ball = new Ball(Vector2.ZERO, BallParameters.BALL_SIZE.mult(SIZE_FACTOR), ballImage, ballSound);
         setRandomBallSpeed(ball);
         ball.setCenter(spawnAt);
+        ball.setTag(BallParameters.BALL_TAG);
         manager.addGameObject(ball, true);
     }
 
