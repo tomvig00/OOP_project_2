@@ -1,4 +1,4 @@
-package bricker.game_objects;
+package bricker.gameobjects;
 
 import bricker.game_parameters.BallParameters;
 import danogl.GameObject;

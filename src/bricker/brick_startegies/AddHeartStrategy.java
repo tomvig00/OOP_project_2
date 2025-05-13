@@ -1,6 +1,6 @@
 package bricker.brick_startegies;
 
-import bricker.game_objects.FallingHeart;
+import bricker.gameobjects.FallingHeart;
 import bricker.game_parameters.HeartParameters;
 import bricker.main.BrickerGameManager;
 import danogl.GameObject;

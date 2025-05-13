@@ -1,7 +1,7 @@
 package bricker.brick_startegies;
 
 import bricker.game_parameters.BallParameters;
-import bricker.game_objects.Ball;
+import bricker.gameobjects.Ball;
 import bricker.main.BrickerGameManager;
 import danogl.GameObject;
 import danogl.gui.Sound;
