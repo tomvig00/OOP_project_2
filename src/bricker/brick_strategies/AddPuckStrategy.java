@@ -1,4 +1,4 @@
-package bricker.brick_startegies;
+package bricker.brick_strategies;
 
 import bricker.game_parameters.BallParameters;
 import bricker.gameobjects.Ball;

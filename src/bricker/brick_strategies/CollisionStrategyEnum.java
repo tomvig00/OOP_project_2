@@ -1,4 +1,4 @@
-package bricker.brick_startegies;
+package bricker.brick_strategies;
 
 /**
  * enum representing different collision strategies.

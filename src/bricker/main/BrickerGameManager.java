@@ -1,9 +1,9 @@
 package bricker.main;
 
-import bricker.brick_startegies.BasicCollisionStrategy;
-import bricker.brick_startegies.CollisionStrategy;
-import bricker.brick_startegies.CollisionStrategyEnum;
-import bricker.brick_startegies.CollisionStrategyFactory;
+import bricker.brick_strategies.BasicCollisionStrategy;
+import bricker.brick_strategies.CollisionStrategy;
+import bricker.brick_strategies.CollisionStrategyEnum;
+import bricker.brick_strategies.CollisionStrategyFactory;
 import bricker.game_parameters.*;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.HeartBar;
