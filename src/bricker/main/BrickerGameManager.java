@@ -31,7 +31,7 @@ public class BrickerGameManager extends GameManager {
 
     // Game Settings
     private static final String GAME_TITLE = "Bricker";
-    private static final Vector2 WINDOW_SIZE = new Vector2(700, 500);
+    private static final Vector2 WINDOW_SIZE = new Vector2(1000, 700);
     private static final String BACKGROUND_IMAGE_PATH = "assets/DARK_BG2_small.jpeg";
 
     private Renderable turboImage;
@@ -56,7 +56,7 @@ public class BrickerGameManager extends GameManager {
     private Paddle extraPaddle;
 
     private boolean isInTurbo = false;
-    private int counterWhenturboStarted = 0;
+    private int counterWhenTurboStarted = 0;
 
     private Vector2 windowDimensions;
     private ImageReader imageReader;
@@ -138,7 +138,8 @@ public class BrickerGameManager extends GameManager {
      *                         concerning the window.
      */
     @Override
-    public void initializeGame(ImageReader imageReader, SoundReader soundReader, UserInputListener inputListener, WindowController windowController) {
+    public void initializeGame(ImageReader imageReader, SoundReader soundReader,
+                               UserInputListener inputListener, WindowController windowController) {
         this.inputListener = inputListener;
         super.initializeGame(imageReader, soundReader, inputListener, windowController);
         this.imageReader = imageReader;
@@ -203,7 +204,7 @@ public class BrickerGameManager extends GameManager {
         mainBall.renderer().setRenderable(turboImage);
         mainBall.setVelocity(mainBall.getVelocity().mult(TurboParameters.TURBO_FACTOR));
 
-        counterWhenturboStarted = mainBall.getCollisionCounter();
+        counterWhenTurboStarted = mainBall.getCollisionCounter();
     }
 
     /**
@@ -306,7 +307,7 @@ public class BrickerGameManager extends GameManager {
         if (!isInTurbo) {
             return;
         }
-        if (mainBall.getCollisionCounter() >= GameRules.MAX_TURBO_COLLISIONS + counterWhenturboStarted) {
+        if (mainBall.getCollisionCounter() >= GameRules.MAX_TURBO_COLLISIONS + counterWhenTurboStarted) {
             exitTurboMode();
         }
     }
@@ -337,8 +338,8 @@ public class BrickerGameManager extends GameManager {
                 HeartParameters.HEART_BAR_POSITION_OFFSET.x(),
                 windowDimensions.y() - HeartParameters.HEART_SIZE.y()
         );
-        heartBar = new HeartBar(heartBarPosition, HeartParameters.HEART_SIZE, heartImage, GameRules.MAX_HEARTS,
-                GameRules.INITIAL_HEARTS, gameObjects());
+        heartBar = new HeartBar(heartBarPosition, HeartParameters.HEART_SIZE,
+                heartImage, GameRules.MAX_HEARTS, GameRules.INITIAL_HEARTS, gameObjects());
     }
 
     // creates the brick grid
@@ -351,8 +352,10 @@ public class BrickerGameManager extends GameManager {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < bricksInRow; col++) {
-                float x = WallParameters.WALL_WIDTH + BrickParameters.BRICK_X_GAP + col * (brickWidth + BrickParameters.BRICK_X_GAP);
-                float y = WallParameters.WALL_HEIGHT + BrickParameters.BRICK_Y_GAP + row * (BrickParameters.BRICK_HEIGHT + BrickParameters.BRICK_Y_GAP);
+                float x = WallParameters.WALL_WIDTH + BrickParameters.BRICK_X_GAP +
+                        col * (brickWidth + BrickParameters.BRICK_X_GAP);
+                float y = WallParameters.WALL_HEIGHT + BrickParameters.BRICK_Y_GAP +
+                        row * (BrickParameters.BRICK_HEIGHT + BrickParameters.BRICK_Y_GAP);
                 CollisionStrategy strategy = getRandomStrategy();
                 createBrick(imageReader, new Vector2(x, y), brickSize,
                         strategy);

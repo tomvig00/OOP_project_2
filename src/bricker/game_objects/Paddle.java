@@ -15,20 +15,20 @@ import java.awt.event.KeyEvent;
  */
 public class Paddle extends GameObject {
 
-    private static final float MOVEMENT_SPEED = 300;
+    private static final float MOVEMENT_SPEED = 350;
     private final UserInputListener inputListener;
     private final float leftEdge;
     private final float rightEdge;
     private int collisionCounter;
 
     /**
-     * Construct a new GameObject instance.
+     * Construct a new Paddle instance.
      *
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
      * @param dimensions    Width and height in window coordinates.
      * @param renderable    The renderable representing the object. Can be null, in which case
-     *                      the GameObject will not be rendered.
+     *                      the Paddle will not be rendered.
      * @param inputListener - input listener to draw movement from.
      * @param leftBorder - left border of the paddle
      * @param rightBorder - right border of the paddle

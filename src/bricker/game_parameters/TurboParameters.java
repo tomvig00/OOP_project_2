@@ -7,10 +7,10 @@ package bricker.game_parameters;
  */
 public class TurboParameters {
 
-    // factor to multiply spped by
+    /** factor to multiply spped by */
     public static final float TURBO_FACTOR = 1.4f;
 
-    // turbo mode image path
+    /** turbo mode image path */
     public static final String TURBO_IMAGE_PATH = "assets/redball.png";
 
 }

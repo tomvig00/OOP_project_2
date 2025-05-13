@@ -10,10 +10,10 @@ import danogl.GameObject;
  */
 public abstract class CollisionStrategyDecorator implements CollisionStrategy {
 
-    // the game manager of the current game.
+    /** the game manager of the current game. */
     protected BrickerGameManager manager;
 
-    // the base strategy to wrap.
+    /** the base strategy to wrap. */
     protected CollisionStrategy baseStrategy;
 
     /**

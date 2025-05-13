@@ -14,6 +14,8 @@ import java.util.List;
 /**
  * HeartBar represents a bar of hearts displayed at the bottom-left of the screen.
  * It displays a number in the first slot and the hearts to its right.
+ *
+ * @author tal.ronen1, tomvig00
  */
 public class HeartBar extends GameObject {
     // Layout

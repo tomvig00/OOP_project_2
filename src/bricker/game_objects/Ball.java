@@ -16,13 +16,14 @@ public class Ball extends GameObject {
     private final Sound collisionSound;
 
     /**
-     * Construct a new GameObject instance.
+     * Construct a new Ball instance.
      *
      * @param topLeftCorner Position of the object, in window coordinates (pixels).
      *                      Note that (0,0) is the top-left corner of the window.
      * @param dimensions    Width and height in window coordinates.
      * @param renderable    The renderable representing the object. Can be null, in which case
-     *                      the GameObject will not be rendered.
+     *                      the Ball will not be rendered.
+     * @param collisionSound The sound which will be played when the ball collides with anything
      */
     public Ball(Vector2 topLeftCorner, Vector2 dimensions, Renderable renderable,
                 Sound collisionSound) {
