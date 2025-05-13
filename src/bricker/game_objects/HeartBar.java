@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author tal.ronen1, tomvig00
  */
-public class HeartBar extends GameObject {
+public class HeartBar {
     // Layout
     private static final float HEART_SPACING = 5;
 
@@ -38,6 +38,7 @@ public class HeartBar extends GameObject {
 
     private final GameObject numberDisplay;
     private final TextRenderable numberText;
+    private final Vector2 topLeftCorner;
 
     /**
      * constructor
@@ -55,12 +56,12 @@ public class HeartBar extends GameObject {
                     int maxHearts,
                     int initialHearts,
                     GameObjectCollection gameObjects) {
-        super(topLeftCorner, calculateBarDimensions(heartSize, maxHearts), null);
         this.gameObjects = gameObjects;
         this.hearts = new ArrayList<>();
         this.heartImage = heartImage;
         this.heartSize = heartSize;
         this.maxHearts = maxHearts;
+        this.topLeftCorner = topLeftCorner;
 
         // Create numeric display in the first slot
         numberText = new TextRenderable(String.valueOf(initialHearts));
@@ -82,7 +83,7 @@ public class HeartBar extends GameObject {
      */
     public void addHeart() {
         if (hearts.size() < maxHearts) {
-            Vector2 position = getTopLeftCorner().add(new Vector2(
+            Vector2 position = topLeftCorner.add(new Vector2(
                     (heartSize.x() + HEART_SPACING) * (hearts.size() + 1), 0)); // +1 to skip number
             GameObject heart = new GameObject(position, heartSize, heartImage);
             hearts.add(heart);
