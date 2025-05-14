@@ -50,7 +50,6 @@ public class BrickerGameManager extends GameManager {
     private Ball mainBall;
     private HeartBar heartBar;
     private Counter brickCounter;
-    //    private Ball[] otherBalls;
     private final Vector<GameObject> movingObjects;
     private Paddle mainPaddle;
     private Paddle extraPaddle;

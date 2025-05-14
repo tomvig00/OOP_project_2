@@ -68,15 +68,6 @@ public class Paddle extends GameObject {
     }
 
     /**
-     * topLeftCorner getter
-     * @return topLeftCorner of paddle
-     */
-    @Override
-    public Vector2 getTopLeftCorner() {
-        return super.getTopLeftCorner();
-    }
-
-    /**
      * onCollisionEnter Override
      * @param other The GameObject with which a collision occurred.
      * @param collision Information regarding this collision.
